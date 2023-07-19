@@ -6,9 +6,10 @@ import (
 
 func main() {
 	csvSearcher := fileanalysis.CSVSearcher{
-		Directory: "C:\\Users\\Vincent Dizon\\Documents\\sampleData\\",
+		Directory: "C:\\Users\\Vincent Dizon\\Documents\\sampleData\\out\\",
 	}
 
 	csvSearcher.Search()
+	csvSearcher.AnalyzePairs()
 
 }

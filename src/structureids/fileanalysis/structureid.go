@@ -11,15 +11,14 @@ import (
 
 type StructureID struct {
 	FileName string
-	ID       int
 	Pairs    map[string]bool
 }
 
 func (sid *StructureID) SearchPairs(waitGroup *sync.WaitGroup) {
 	startTime := time.Now()
 
-	fmt.Println("[goroutine] parsing pairs for Structure ID", sid.ID)
-	defer fmt.Println("[goroutine] done parsing pairs for Structure ID", sid.ID, "in", time.Since(startTime))
+	fmt.Println("[goroutine] parsing pairs for Structure ID", sid.FileName)
+	defer fmt.Println("[goroutine] done parsing pairs for Structure ID", sid.FileName, "in", time.Since(startTime))
 
 	defer waitGroup.Done()
 	file, openError := os.Open(sid.FileName)
@@ -39,8 +38,8 @@ func (sid *StructureID) SearchPairs(waitGroup *sync.WaitGroup) {
 		}
 
 		var pair string
-		gene1 := parsedString[1]
-		gene2 := parsedString[2]
+		gene1 := parsedString[0]
+		gene2 := parsedString[1]
 
 		if strings.Compare(gene1, gene2) < 0 {
 			pair = gene1 + "," + gene2
