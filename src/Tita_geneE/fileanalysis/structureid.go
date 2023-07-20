@@ -12,6 +12,7 @@ import (
 type StructureID struct {
 	FileName string
 	Pairs    map[string]bool
+	// SearchedPairs map[*StructureID]bool
 }
 
 func (sid *StructureID) SearchPairs(waitGroup *sync.WaitGroup) {
@@ -51,3 +52,5 @@ func (sid *StructureID) SearchPairs(waitGroup *sync.WaitGroup) {
 	}
 
 }
+
+// func (structID *StructureID)

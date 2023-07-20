@@ -16,4 +16,16 @@ GoLang offers faster parsing than Java, but Java has more mobility in terms of m
 5. Also add the value to another map that contains the structure id that contains it
 	5.1. If the gene pair is discovered to be a duplicated one down the line, then remove it from the map
 6. Export the unique and shared pairs to a .csv file 
-	6.1. Shared: gene1,gene2,frequency
+	6.1. Shared: gene1,gene2,frequeny
+
+
+Pt. 2
+
+When I have to make seperate CSV files for each unique structure pairs
+
+1. Create copy of the map of csv files,
+2. Iterate through the csv file map
+	2.1. Create a structure pair, then at the end of the loop remove said structure pair to avoid duplicate pairs 
+3. For each structure pair, create a csv file relating to each structure id name
+	3.1. Search for shared pairs using goroutines and channels
+

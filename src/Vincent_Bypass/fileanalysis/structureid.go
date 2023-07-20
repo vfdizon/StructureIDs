@@ -72,7 +72,8 @@ func (sid *StructureID) WritePairs(newFileName string) {
 		fmt.Println("directory already exists")
 	}
 
-	newFileName = filepath.Join(sid.OutDirectory, strings.Split(filepath.Base(newFileName), ".csv")[0]+"_CLEANED.csv")
+	csvFilename := strings.Replace(strings.Split(filepath.Base(sid.FileName), ".csv")[0], "dirty", "cleaned", -1) + ".csv"
+	newFileName = filepath.Join(sid.OutDirectory, csvFilename)
 
 	file, createErr := os.Create(newFileName)
 

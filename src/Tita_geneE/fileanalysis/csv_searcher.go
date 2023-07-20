@@ -24,7 +24,7 @@ type CSVSearcher struct {
 
 func (csvs *CSVSearcher) Search() {
 	csvs.StructIDs = make(map[*StructureID]bool)
-	csvs.outDirectory = filepath.Join(csvs.Directory, "out")
+	csvs.outDirectory = filepath.Join(csvs.Directory, "geneE_out")
 	os.Mkdir(csvs.outDirectory, os.ModePerm)
 
 	csvs.sharedPairsWriter = &CSVWriter{
@@ -79,14 +79,7 @@ func (csvs *CSVSearcher) AnalyzePairs() {
 
 	for structID, _ := range csvs.StructIDs {
 		for pair, _ := range structID.Pairs {
-			_, contains := csvs.seenPairs[pair]
-			if contains {
-				csvs.handleDuplicatePairs(pair)
-			} else {
-				csvs.seenPairs[pair] = true
-				csvs.uniquePairs[pair] = structID.FileName
-			}
-
+			csvs.searchForDuplicates(pair, structID.FileName)
 		}
 	}
 }
@@ -102,6 +95,16 @@ func (csvs *CSVSearcher) WritePairs() {
 
 	csvs.sharedPairsWriter.CloseCSV()
 	csvs.uniquePairsWriter.CloseCSV()
+}
+
+func (csvs *CSVSearcher) searchForDuplicates(pair string, structID string) {
+	_, contains := csvs.seenPairs[pair]
+	if contains {
+		csvs.handleDuplicatePairs(pair)
+	} else {
+		csvs.seenPairs[pair] = true
+		csvs.uniquePairs[pair] = structID
+	}
 }
 
 func (csvs *CSVSearcher) handleDuplicatePairs(duplicatePair string) {
