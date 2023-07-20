@@ -2,7 +2,6 @@ package fileanalysis
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,13 +12,8 @@ type CSVSearcher struct {
 	Directory string
 	StructIDs map[*StructureID]bool
 
-	seenPairs      map[string]bool
-	uniquePairs    map[string]string
-	duplicatePairs map[string]*int
-
-	outDirectory      string
-	sharedPairsWriter *CSVWriter
-	uniquePairsWriter *CSVWriter
+	structurePairs []*StructurePair
+	outDirectory   string
 }
 
 func (csvs *CSVSearcher) Search() {
@@ -27,20 +21,7 @@ func (csvs *CSVSearcher) Search() {
 	csvs.outDirectory = filepath.Join(csvs.Directory, "geneE_out")
 	os.Mkdir(csvs.outDirectory, os.ModePerm)
 
-	csvs.sharedPairsWriter = &CSVWriter{
-		FileName:     "shared_pairs.csv",
-		OutDirectory: csvs.outDirectory,
-	}
-
-	csvs.uniquePairsWriter = &CSVWriter{
-		FileName:     "unique_pairs.csv",
-		OutDirectory: csvs.outDirectory,
-	}
-
-	csvs.sharedPairsWriter.CreateCSV("gene1,gene2,frequency")
-	csvs.uniquePairsWriter.CreateCSV("gene1,gene2,structure_id")
-
-	var waitGroup sync.WaitGroup
+	var parseWaitGroup sync.WaitGroup
 
 	dir, openErr := os.Open(csvs.Directory)
 	files, readErr := dir.Readdir(0)
@@ -56,7 +37,7 @@ func (csvs *CSVSearcher) Search() {
 		}
 
 		if strings.HasSuffix(file.Name(), ".csv") {
-			waitGroup.Add(1)
+			parseWaitGroup.Add(1)
 
 			structID := StructureID{
 				FileName: csvs.Directory + file.Name(),
@@ -64,58 +45,44 @@ func (csvs *CSVSearcher) Search() {
 
 			csvs.StructIDs[&structID] = true
 
-			go structID.SearchPairs(&waitGroup)
+			go structID.SearchPairs(&parseWaitGroup)
 		}
 	}
 
-	waitGroup.Wait()
+	parseWaitGroup.Wait()
+
+	csvs.createPairs()
+
+	var searchWaitGroup sync.WaitGroup
+	searchWaitGroup.Add(len(csvs.structurePairs))
+
+	for _, structIDPair := range csvs.structurePairs {
+		go structIDPair.SearchForDuplicates(&searchWaitGroup)
+	}
+
+	searchWaitGroup.Wait()
 
 }
 
-func (csvs *CSVSearcher) AnalyzePairs() {
-	csvs.seenPairs = make(map[string]bool)
-	csvs.uniquePairs = make(map[string]string)
-	csvs.duplicatePairs = make(map[string]*int)
+func (csvs *CSVSearcher) createPairs() {
+	csvs.structurePairs = []*StructurePair{}
+	structIDsCopy := csvs.StructIDs
 
-	for structID, _ := range csvs.StructIDs {
-		for pair, _ := range structID.Pairs {
-			csvs.searchForDuplicates(pair, structID.FileName)
+	for structID1, _ := range structIDsCopy {
+		for structID2, _ := range structIDsCopy {
+			if structID1 == structID2 {
+				continue
+			}
+
+			structPair := StructurePair{
+				StructureID1:   structID1,
+				StructureID2:   structID2,
+				ExportFilePath: csvs.outDirectory,
+			}
+
+			csvs.structurePairs = append(csvs.structurePairs, &structPair)
+
 		}
+		delete(csvs.StructIDs, structID1)
 	}
-}
-
-func (csvs *CSVSearcher) WritePairs() {
-	for duplicatedPair, frequency := range csvs.duplicatePairs {
-		csvs.sharedPairsWriter.WriteCSV(duplicatedPair + "," + fmt.Sprintf("%d", *frequency))
-	}
-
-	for uniquePair, structID := range csvs.uniquePairs {
-		csvs.uniquePairsWriter.WriteCSV(uniquePair + "," + structID)
-	}
-
-	csvs.sharedPairsWriter.CloseCSV()
-	csvs.uniquePairsWriter.CloseCSV()
-}
-
-func (csvs *CSVSearcher) searchForDuplicates(pair string, structID string) {
-	_, contains := csvs.seenPairs[pair]
-	if contains {
-		csvs.handleDuplicatePairs(pair)
-	} else {
-		csvs.seenPairs[pair] = true
-		csvs.uniquePairs[pair] = structID
-	}
-}
-
-func (csvs *CSVSearcher) handleDuplicatePairs(duplicatePair string) {
-	val, contains := csvs.duplicatePairs[duplicatePair]
-	if !contains {
-		csvs.duplicatePairs[duplicatePair] = new(int)
-		*csvs.duplicatePairs[duplicatePair] = 2
-	} else {
-		*val++
-	}
-
-	delete(csvs.uniquePairs, duplicatePair)
-
 }

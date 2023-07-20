@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type CSVWriter struct {
@@ -14,7 +15,7 @@ type CSVWriter struct {
 }
 
 func (csvw *CSVWriter) CreateCSV(header string) {
-	file, createError := os.Create(csvw.OutDirectory + "/" + csvw.FileName)
+	file, createError := os.Create(filepath.Join(csvw.OutDirectory, csvw.FileName))
 	if createError != nil {
 		panic(createError)
 	}

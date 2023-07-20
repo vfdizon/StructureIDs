@@ -20,6 +20,4 @@ func main() {
 	}
 
 	csvSearcher.Search()
-	csvSearcher.AnalyzePairs()
-	csvSearcher.WritePairs()
 }
