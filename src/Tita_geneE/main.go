@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
-	"github.com/vfdizon/duplicatecleaner/fileanalysis"
+	"github.com/vfdizon/Tita_geneE/fileanalysis"
 )
 
 func main() {
@@ -16,15 +15,11 @@ func main() {
 	directory, _ := inputReader.ReadString('\n')
 	directory = strings.TrimSpace(directory)
 
-	fmt.Println(directory)
-
 	csvSearcher := fileanalysis.CSVSearcher{
 		Directory: directory,
 	}
 
-	startTime := time.Now()
-
 	csvSearcher.Search()
-
-	fmt.Println("Done in", time.Since(startTime))
+	csvSearcher.AnalyzePairs()
+	csvSearcher.WritePairs()
 }

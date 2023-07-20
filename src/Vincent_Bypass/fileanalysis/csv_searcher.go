@@ -10,12 +10,15 @@ import (
 )
 
 type CSVSearcher struct {
-	Directory string
-	StructIDs map[*StructureID]bool
+	Directory    string
+	StructIDs    map[*StructureID]bool
+	outDirectory string
 }
 
 func (csvs *CSVSearcher) Search() {
 	csvs.StructIDs = make(map[*StructureID]bool)
+	csvs.outDirectory = filepath.Join(csvs.Directory, "out")
+	os.Mkdir(csvs.outDirectory, os.ModePerm)
 
 	var waitGroup sync.WaitGroup
 

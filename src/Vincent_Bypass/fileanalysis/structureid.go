@@ -43,10 +43,17 @@ func (sid *StructureID) SearchPairs(waitGroup *sync.WaitGroup) {
 		gene1 := parsedString[1]
 		gene2 := parsedString[2]
 
-		if strings.Compare(gene1, gene2) < 0 {
+		gene1 = strings.TrimSpace(gene1)
+		gene2 = strings.TrimSpace(gene2)
+
+		comparison := strings.Compare(gene1, gene2)
+
+		if comparison == -1 {
 			pair = gene1 + "," + gene2
-		} else {
+		} else if comparison == 1 {
 			pair = gene2 + "," + gene1
+		} else {
+			continue
 		}
 
 		sid.Pairs[pair] = true
