@@ -17,7 +17,7 @@ type CSVSearcher struct {
 
 func (csvs *CSVSearcher) Search() {
 	csvs.StructIDs = make(map[*StructureID]bool)
-	csvs.outDirectory = filepath.Join(csvs.Directory, "out")
+	csvs.outDirectory = filepath.Join(csvs.Directory, "clean_out")
 	os.Mkdir(csvs.outDirectory, os.ModePerm)
 
 	var waitGroup sync.WaitGroup
@@ -40,7 +40,7 @@ func (csvs *CSVSearcher) Search() {
 
 			structID := StructureID{
 				FileName:     csvs.Directory + file.Name(),
-				OutDirectory: filepath.Join(csvs.Directory, "out"),
+				OutDirectory: csvs.outDirectory,
 			}
 
 			csvs.StructIDs[&structID] = true

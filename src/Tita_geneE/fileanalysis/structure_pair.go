@@ -2,6 +2,7 @@ package fileanalysis
 
 import (
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -38,7 +39,7 @@ func (sp *StructurePair) SearchForDuplicates(waitGroup *sync.WaitGroup) {
 }
 
 func (sp *StructurePair) exportPairs() {
-	fileName := filepath.Base(sp.StructureID1.FileName) + "_SHARED_" + filepath.Base(sp.StructureID2.FileName)
+	fileName := strings.Split(filepath.Base(sp.StructureID1.FileName), ".csv")[0] + "_SHARED_" + filepath.Base(sp.StructureID2.FileName)
 
 	sp.exportCSV = &CSVWriter{
 		FileName:     fileName,

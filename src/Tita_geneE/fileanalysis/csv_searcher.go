@@ -14,6 +14,7 @@ type CSVSearcher struct {
 
 	structurePairs []*StructurePair
 	outDirectory   string
+	masterCSV      *CSVWriter
 }
 
 func (csvs *CSVSearcher) Search() {
@@ -61,7 +62,24 @@ func (csvs *CSVSearcher) Search() {
 	}
 
 	searchWaitGroup.Wait()
+	csvs.exportToMasterCSV()
+}
 
+func (csvs *CSVSearcher) exportToMasterCSV() {
+	csvs.masterCSV = &CSVWriter{
+		FileName:     "master_shared.csv",
+		OutDirectory: csvs.outDirectory,
+	}
+
+	csvs.masterCSV.CreateCSV("Gene1,Gene2")
+
+	for _, structIDPair := range csvs.structurePairs {
+		for pair, _ := range structIDPair.SharedPairs {
+			csvs.masterCSV.WriteCSV(pair)
+		}
+	}
+
+	csvs.masterCSV.CloseCSV()
 }
 
 func (csvs *CSVSearcher) createPairs() {
