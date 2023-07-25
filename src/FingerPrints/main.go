@@ -20,6 +20,8 @@ func main() {
 		Directory:       directory,
 		OutputDirectory: filepath.Join(directory, "fingerprints"),
 	}
-
 	csvSearcher.Search()
+
+	//test
+	//comment test
 }

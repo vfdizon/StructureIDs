@@ -11,6 +11,7 @@ type StructureID struct {
 	Directory       string
 	FileName        string
 	OutputDirectory string
+	Complexity *int
 
 	NodeConnections map[string]*string
 }
@@ -55,7 +56,7 @@ func (s *StructureID) WriteFile() {
 	}
 
 	defer outputFile.Close()
-
+	
 	outputFileWriter := bufio.NewWriter(outputFile)
 
 	outputFileWriter.WriteString("digraph {\n")
