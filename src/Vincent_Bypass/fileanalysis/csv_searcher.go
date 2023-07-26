@@ -13,6 +13,7 @@ type CSVSearcher struct {
 	Directory    string
 	StructIDs    map[*StructureID]bool
 	outDirectory string
+	Verbose      bool
 }
 
 func (csvs *CSVSearcher) Search() {
@@ -41,6 +42,7 @@ func (csvs *CSVSearcher) Search() {
 			structID := StructureID{
 				FileName:     csvs.Directory + file.Name(),
 				OutDirectory: csvs.outDirectory,
+				Verbose:      csvs.Verbose,
 			}
 
 			csvs.StructIDs[&structID] = true
@@ -48,7 +50,9 @@ func (csvs *CSVSearcher) Search() {
 			go structID.SearchPairs(&waitGroup)
 		}
 
-		fmt.Print("\n")
+		if csvs.Verbose {
+			fmt.Print("\n")
+		}
 	}
 
 	waitGroup.Wait()

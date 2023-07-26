@@ -14,14 +14,16 @@ type StructureID struct {
 	FileName     string
 	OutDirectory string
 	Pairs        map[string]bool
+	Verbose      bool
 }
 
 func (sid *StructureID) SearchPairs(waitGroup *sync.WaitGroup) {
 	defer waitGroup.Done()
 	startTime := time.Now()
-
-	fmt.Println("[goroutine] parsing pairs for Structure ID" + filepath.Base(sid.FileName))
-	defer fmt.Println("[goroutine] done parsing pairs for Structure ID", filepath.Base(sid.FileName), "in", time.Since(startTime))
+	if sid.Verbose {
+		fmt.Println("[goroutine] parsing pairs for Structure ID" + filepath.Base(sid.FileName))
+		defer fmt.Println("[goroutine] done parsing pairs for Structure ID", filepath.Base(sid.FileName), "in", time.Since(startTime))
+	}
 
 	file, openError := os.Open(sid.FileName)
 	sid.Pairs = make(map[string]bool)
@@ -61,20 +63,18 @@ func (sid *StructureID) SearchPairs(waitGroup *sync.WaitGroup) {
 	}
 
 	sid.WritePairs(file.Name())
-	fmt.Println("[goroutine] wrote pairs for Structure ID", filepath.Base(sid.FileName))
+	if sid.Verbose {
+		fmt.Println("[goroutine] wrote pairs for Structure ID", filepath.Base(sid.FileName))
+	}
 
 }
 
 func (sid *StructureID) WritePairs(newFileName string) {
-	err := os.Mkdir(sid.OutDirectory, os.ModePerm)
-
-	if err != nil {
-		fmt.Println("directory already exists")
-	}
+	os.Mkdir(sid.OutDirectory, os.ModePerm)
 
 	csvFilename := strings.Replace(strings.Split(filepath.Base(sid.FileName), ".csv")[0], "dirty", "cleaned", -1) + ".csv"
-	newFileName = filepath.Join(sid.OutDirectory, csvFilename)
 
+	newFileName = filepath.Join(sid.OutDirectory, csvFilename)
 	file, createErr := os.Create(newFileName)
 
 	if createErr != nil {
@@ -91,6 +91,8 @@ func (sid *StructureID) WritePairs(newFileName string) {
 
 	csvWriter.Flush()
 
-	fmt.Println("[goroutine] wrote pairs for Structure ID", filepath.Base(sid.FileName))
+	if sid.Verbose {
+		fmt.Println("[goroutine] wrote pairs for Structure ID", filepath.Base(sid.FileName))
+	}
 
 }

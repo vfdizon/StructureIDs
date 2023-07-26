@@ -12,6 +12,7 @@ type CSVSearcher struct {
 	StructIDDirectory   string
 	MasterFileDirectory string
 	StructIDs           map[*StructureID]bool
+	Verbose             bool
 
 	outDirectory     string
 	masterFileReader *MasterFile
@@ -48,6 +49,7 @@ func (csvs *CSVSearcher) Search() {
 			structID := StructureID{
 				FileName:     csvs.StructIDDirectory + file.Name(),
 				OutDirectory: csvs.outDirectory,
+				Verbose:      csvs.Verbose,
 			}
 
 			csvs.StructIDs[&structID] = true

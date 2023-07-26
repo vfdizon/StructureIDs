@@ -13,6 +13,7 @@ type CSVWriter struct {
 	OutDirectory string
 	CSVFile      *os.File
 	FileWriter   *bufio.Writer
+	Verbose      bool
 }
 
 func (csvw *CSVWriter) CreateCSV(header string) {
@@ -36,6 +37,7 @@ func (csvw *CSVWriter) WriteCSV(line ...string) {
 func (csvw *CSVWriter) CloseCSV() {
 	csvw.FileWriter.Flush()
 	csvw.CSVFile.Close()
-
-	fmt.Println("[CSVWriter] closed CSV file")
+	if csvw.Verbose {
+		fmt.Println("[CSVWriter] closed CSV file")
+	}
 }

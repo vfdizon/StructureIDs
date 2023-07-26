@@ -1,27 +1,28 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
+	"flag"
 	"path/filepath"
 	"strings"
 
 	"github.com/vfdizon/fingerprints/fileanalysis"
 )
 
+var (
+	CSVFileDirectory string
+)
+
+func init() {
+	flag.StringVar(&CSVFileDirectory, "i", "", "Directory of .csv files containing unique gene pairs for each Structure ID")
+}
+
 func main() {
-	inputReader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter directory for all of the .csv files: ")
-	directory, _ := inputReader.ReadString('\n')
-	directory = strings.TrimSpace(directory)
+	flag.Parse()
+	directory := strings.TrimSpace(CSVFileDirectory)
 
 	csvSearcher := fileanalysis.CSVSearcher{
 		Directory:       directory,
 		OutputDirectory: filepath.Join(directory, "fingerprints"),
 	}
 	csvSearcher.Search()
-
-	//test
-	//comment test
 }

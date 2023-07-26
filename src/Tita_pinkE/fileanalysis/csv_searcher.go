@@ -11,6 +11,7 @@ import (
 type CSVSearcher struct {
 	Directory string
 	StructIDs map[*StructureID]bool
+	Verbose   bool
 
 	structurePairs []*StructurePair
 	outDirectory   string
@@ -42,6 +43,7 @@ func (csvs *CSVSearcher) Search() {
 
 			structID := StructureID{
 				FileName: csvs.Directory + file.Name(),
+				Verbose:  csvs.Verbose,
 			}
 
 			csvs.StructIDs[&structID] = true
@@ -69,6 +71,7 @@ func (csvs *CSVSearcher) exportToMasterCSV() {
 	csvs.masterCSV = &CSVWriter{
 		FileName:     "nu_master_shared.csv",
 		OutDirectory: csvs.outDirectory,
+		Verbose:      csvs.Verbose,
 	}
 
 	csvs.masterCSV.CreateCSV("Gene1,Gene2")

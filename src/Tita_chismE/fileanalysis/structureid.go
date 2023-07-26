@@ -13,6 +13,7 @@ import (
 type StructureID struct {
 	FileName string
 	Pairs    map[string]bool
+	Verbose  bool
 
 	OutDirectory string
 	outWriter    *CSVWriter
@@ -20,9 +21,10 @@ type StructureID struct {
 
 func (sid *StructureID) SearchPairs(waitGroup *sync.WaitGroup) {
 	startTime := time.Now()
-
-	fmt.Println("[goroutine] parsing pairs for Structure ID", sid.FileName)
-	defer fmt.Println("[goroutine] done parsing pairs for Structure ID", sid.FileName, "in", time.Since(startTime))
+	if sid.Verbose {
+		fmt.Println("[goroutine] parsing pairs for Structure ID", sid.FileName)
+		defer fmt.Println("[goroutine] done parsing pairs for Structure ID", sid.FileName, "in", time.Since(startTime))
+	}
 
 	defer waitGroup.Done()
 	file, openError := os.Open(sid.FileName)

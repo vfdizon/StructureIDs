@@ -1,34 +1,46 @@
 package main
 
 import (
-	"bufio"
+	"flag"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/vfdizon/Tita_chismE/fileanalysis"
 )
 
+var (
+	StructIDDirectory   string
+	MasterFileDirectory string
+	Verbose             bool
+)
+
+func init() {
+	flag.StringVar(&StructIDDirectory, "i", "", "Directory of where the claned Structure ID files are located")
+	flag.StringVar(&MasterFileDirectory, "m", "", "Directory of the master file containing the shared pairs")
+	flag.BoolVar(&Verbose, "v", false, "Verbose")
+}
+
 func main() {
-	inputReader := bufio.NewReader(os.Stdin)
+	flag.Parse()
+	structIDDirectory := strings.TrimSpace(StructIDDirectory)
 
-	fmt.Println("Enter directory of Structure ID files:")
-	structIDDirectory, _ := inputReader.ReadString('\n')
-	structIDDirectory = strings.TrimSpace(structIDDirectory)
-
-	fmt.Println("Enter directory of master file:")
-	masterFileDirectory, _ := inputReader.ReadString('\n')
-	masterFileDirectory = strings.TrimSpace(masterFileDirectory)
+	masterFileDirectory := strings.TrimSpace(MasterFileDirectory)
 
 	startTime := time.Now()
 	csvSearcher := fileanalysis.CSVSearcher{
 		StructIDDirectory:   structIDDirectory,
 		MasterFileDirectory: masterFileDirectory,
+		Verbose:             Verbose,
 	}
 
 	csvSearcher.Search()
+	if Verbose {
+		fmt.Println("Done in", time.Since(startTime))
+	}
 
-	fmt.Println("Done in", time.Since(startTime))
+}
 
+func ProgramIsVerbose() bool {
+	return Verbose
 }
