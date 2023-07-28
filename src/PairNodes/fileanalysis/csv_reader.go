@@ -34,14 +34,13 @@ func (c *CSVReader) Read() {
 	fileReader.Scan()
 	for fileReader.Scan() {
 		line := fileReader.Text()
-		line = strings.Replace(line, "\"", "", -1)
 
 		parsedLine := strings.Split(line, ",")
 
 		firstStruct := strings.Split(parsedLine[2], "_")[0]
 		secondStruct := strings.Split(parsedLine[3], "_")[0]
 
-		structPair := firstStruct + ":" + secondStruct
+		structPair := "\"" + firstStruct + ":" + secondStruct + "\""
 		genePair := parsedLine[0] + "," + parsedLine[1]
 
 		val, contains := c.GenePairs[genePair]
@@ -75,7 +74,8 @@ func (c *CSVReader) WriteToDotFile() {
 
 	fileWriter.WriteString("digraph { \n")
 	for key, val := range c.GenePairs {
-		fileWriter.WriteString("\"" + key + "\" -> \"" + *val + "[arrowhead=none]; \n")
+		keyOut := strings.Replace(key, "\"", "", -1)
+		fileWriter.WriteString("\"" + keyOut + "\" -> " + *val + " [arrowhead=none]; \n")
 	}
 
 	fileWriter.WriteString("}")
